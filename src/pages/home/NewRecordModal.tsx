@@ -8,7 +8,7 @@ import RecordModel from '../../models/RecordModel';
 import QRCode from 'react-qr-code';
 import html2canvas from "html2canvas";
 import axios from 'axios';
-import urls from '../../utils/constants/urls';
+import urls, { tokens } from '../../utils/constants/urls';
 import { registerService } from '../../services/authService';
 
 const style: SxProps<Theme> = {
@@ -83,7 +83,7 @@ const NewRecordModal: FC<NewRecordModalProps> = (props) => {
 
             await axios({
                 method: 'post',
-                url: `${urls.whatsappApi}image?phone=9${values.phone}@c.us`,
+                url: `${urls.whatsappApi}image/${tokens.whatsappToken}?phone=9${values.phone}@c.us`,
                 headers: { 
                     'Content-Type': 'application/json',
                 },
