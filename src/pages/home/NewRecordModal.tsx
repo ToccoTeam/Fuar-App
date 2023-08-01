@@ -47,7 +47,6 @@ const NewRecordModal: FC<NewRecordModalProps> = (props) => {
     const [state, setState] = useState({
         loading: false,
         url: '',
-        qrCodeUrl: '',
     });
 
     const getQrCode = async () => {
@@ -70,17 +69,14 @@ const NewRecordModal: FC<NewRecordModalProps> = (props) => {
         
         const image = await getQrCode();
         try {
-            const response = await registerService({
+            await registerService({
                 email: values.email,
                 fullName: `${values.name} ${values.surname}`,
                 password: values.email.split("@")[0],
                 pathName: values.email.split("@")[0],
                 phoneNumber: values.phone.toString(),
             });
-
-            if(!response.data.success)
-                throw new Error();
-
+            
             await axios({
                 method: 'post',
                 url: `${urls.whatsappApi}image/${tokens.whatsappToken}?phone=9${values.phone}@c.us`,
@@ -94,8 +90,11 @@ const NewRecordModal: FC<NewRecordModalProps> = (props) => {
 
             successMessage('Mesaj Gönderildi!');
             handleClose();
-        } catch (err) {
-            errorMessage('Hatalı işlem');
+        } catch (err: any) {
+            if(err?.response?.data?.message === 'User path or email already exists.')
+                errorMessage('Girilen email kullanılmaktadır');
+            else
+                errorMessage('Hatalı işlem');
         }
 
         setState((c) => ({ ...c, loading: false }));
@@ -152,7 +151,7 @@ const NewRecordModal: FC<NewRecordModalProps> = (props) => {
                                 onBlur={handleBlur}
                                 onChange={(e) => {
                                     handleChange(e);
-                                    setState(prev => ({...prev, url: urls.baseAppUrl + e.target.value.split("@")[0]}))
+                                    setState(prev => ({...prev, url: urls.baseAppUrl + 'addstore/' + e.target.value.split("@")[0]}));
                                 }}
                                 value={values.email}
                             />
